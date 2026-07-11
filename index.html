@@ -23,7 +23,7 @@
     <div id="staticNotice" class="static-notice hidden"><strong>GitHub Pages 미리보기</strong><span>화면·이미지 업로드·정산 UI를 확인할 수 있습니다. AI 인식은 보안 키가 필요한 서버 기능이므로 로컬 서버에서만 사용할 수 있습니다.</span></div>
     <section id="register" class="view active">
       <div class="hero">
-        <div><span class="eyebrow">AI EXPENSE ASSISTANT</span><h1>영수증 한 장이면,<br><em>비용 등록 끝.</em></h1></div>
+        <div><span class="eyebrow">AI EXPENSE ASSISTANT</span><h1>영수증 한 장이면,<br><em>비용 등록 끝.</em></h1><button id="downloadExcelBtn" class="excel-button" type="button">↓ EXCEL 다운로드</button></div>
         <p>AI가 영수증에서 결제 정보를 읽어옵니다.<br>원본과 나란히 확인하고 바로 정산에 반영하세요.</p>
       </div>
 
@@ -72,7 +72,7 @@
     </section>
 
     <section id="settlement" class="view">
-      <div class="page-title"><div><span class="eyebrow">SETTLEMENT PREVIEW</span><h1>정산 미리보기</h1></div><div class="total-card"><span>총 반영 비용</span><strong id="totalAmount">0원</strong></div></div>
+      <div class="page-title"><div><span class="eyebrow">SETTLEMENT PREVIEW</span><h1>정산 미리보기</h1><button id="downloadSettlementExcelBtn" class="excel-button" type="button">↓ EXCEL 다운로드</button></div><div class="total-card"><span>총 반영 비용</span><strong id="totalAmount">0원</strong></div></div>
       <div class="table-card"><table><thead><tr><th>사용일</th><th>프로젝트 / 아티스트</th><th>사용처</th><th>항목</th><th>사용 목적</th><th class="right">금액</th><th>상태</th></tr></thead><tbody id="settlementRows"></tbody></table><div id="settlementEmpty" class="list-empty">등록된 비용이 없습니다.</div></div>
     </section>
 
@@ -95,6 +95,6 @@
     </div>
   </div>
   <div id="toast" class="toast"><span>✓</span><div><strong>비용 등록이 완료됐어요</strong><small>정산 미리보기에 반영했습니다.</small></div></div>
-  <script src="app.js?v=20260711-5"></script>
+  <script src="app.js?v=20260711-6"></script>
 </body>
 </html>
