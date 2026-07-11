@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/recognize-receipt.py": {
+      "maxDuration": 60
+    }
+  }
+}
