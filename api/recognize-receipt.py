@@ -83,10 +83,15 @@ class handler(BaseHTTPRequestHandler):
             detail = error.read().decode("utf-8", "replace")
             try:
                 api_error = json.loads(detail).get("error", {})
-                message = api_error.get("message", "OpenAI API 요청에 실패했습니다.")
+                code = api_error.get("code") or api_error.get("type")
+                if code == "insufficient_quota":
+                    message = "OpenAI API 사용 한도가 부족합니다. 결제 설정 또는 프로젝트 크레딧을 확인해주세요. 수동 입력으로 계속할 수 있습니다."
+                else:
+                    message = api_error.get("message", "OpenAI API 요청에 실패했습니다.")
             except Exception:
+                code = "openai_error"
                 message = "OpenAI API 요청에 실패했습니다."
-            self.send_json(error.code, {"error": message})
+            self.send_json(error.code, {"error": message, "code": code})
         except Exception as error:
             self.send_json(500, {"error": str(error)})
 
