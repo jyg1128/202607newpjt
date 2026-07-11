@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clearcost — 영수증 비용 등록</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="key-modal.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">clearcost<span>.</span></a>
+    <nav>
+      <button class="nav active" data-view="register">비용 등록</button>
+      <button class="nav" data-view="settlement">정산 미리보기</button>
+      <button class="nav" data-view="archive">영수증 보관함</button>
+    </nav>
+    <button id="apiKeyBtn" class="key-button"><span></span> API 키 연결</button>
+    <div class="avatar">YK</div>
+  </header>
+
+  <main>
+    <section id="register" class="view active">
+      <div class="hero">
+        <div><span class="eyebrow">AI EXPENSE ASSISTANT</span><h1>영수증 한 장이면,<br><em>비용 등록 끝.</em></h1></div>
+        <p>AI가 영수증에서 결제 정보를 읽어옵니다.<br>원본과 나란히 확인하고 바로 정산에 반영하세요.</p>
+      </div>
+
+      <div class="workspace">
+        <section class="panel image-panel">
+          <div class="panel-head"><div><span class="step">01</span><h2>영수증 원본</h2></div><span id="imageBadge" class="badge">이미지 대기</span></div>
+          <label id="dropzone" class="dropzone">
+            <input id="fileInput" type="file" accept="image/*" />
+            <div id="dropPrompt">
+              <div class="upload-icon">↥</div><strong>영수증 이미지를 올려주세요</strong>
+              <span>클릭하거나 파일을 끌어다 놓으세요</span><small>JPG, PNG · 최대 10MB</small>
+            </div>
+            <img id="preview" alt="업로드한 영수증" />
+          </label>
+          <button id="recognizeBtn" class="primary wide" disabled><span>✦</span> AI로 인식하기</button>
+          <button id="changeBtn" class="text-btn hidden">다른 이미지 선택</button>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="panel-head"><div><span class="step">02</span><h2>인식 결과 확인</h2></div><span id="resultBadge" class="badge muted">인식 전</span></div>
+          <div id="emptyState" class="empty-state"><div class="scan-icon">⌗</div><strong>아직 인식된 정보가 없어요</strong><span>왼쪽에서 영수증을 업로드하고<br>AI 인식을 시작해주세요.</span></div>
+          <form id="expenseForm" class="hidden" novalidate>
+            <div id="warning" class="warning">일부 항목은 정확도가 낮아요. 원본과 비교해주세요.</div>
+            <div class="field-grid">
+              <label>매출일 <span class="confidence" data-confidence="paidDate">확인 전</span><input name="paidDate" type="date" required /></label>
+              <label>매출시간 <span class="confidence" data-confidence="paidTime">확인 전</span><input name="paidTime" type="time" step="1" /></label>
+              <label class="full">매장명 <span class="confidence" data-confidence="merchant">확인 전</span><input name="merchant" placeholder="영수증에 표시된 매장명" required /></label>
+              <label>부가세 과세물품가액 <span class="confidence" data-confidence="taxableAmount">확인 전</span><div class="money"><input name="taxableAmount" type="number" min="0" required /><span>원</span></div></label>
+              <label>부가세 <span class="confidence" data-confidence="vat">확인 전</span><div class="money"><input name="vat" type="number" min="0" required /><span>원</span></div></label>
+              <label>총 결제금액 <span class="confidence" data-confidence="amount">확인 전</span><div class="money"><input name="amount" type="number" min="0" required /><span>원</span></div></label>
+              <label>카드명 <span class="confidence" data-confidence="cardName">확인 전</span><input name="cardName" placeholder="예: 신한카드" /></label>
+              <label>카드승인번호 <span class="confidence" data-confidence="approvalNumber">확인 전</span><input name="approvalNumber" /></label>
+            </div>
+            <hr />
+            <div class="field-grid">
+              <label class="full">프로젝트<select name="project" required><option value="">프로젝트 선택</option><option>Artist B 1st EP Jacket Shooting</option><option>Artist C MV Production</option><option>2026 Summer Concert Seoul</option></select></label>
+              <label>아티스트<select name="artist" required><option value="">아티스트 선택</option><option>Artist B</option><option>Artist C</option><option>Group D</option><option>공통비</option></select></label>
+              <label>비용 항목<select name="category"><option>촬영 현장 식비</option><option>아티스트 미팅</option><option>교통비</option><option>숙박비</option><option>의상/스타일링</option><option>기타</option></select></label>
+              <label class="full">사용 목적<textarea name="purpose" rows="3" placeholder="어떤 목적으로 사용했나요?" required></textarea></label>
+            </div>
+            <label class="toggle-row"><span><strong>정산서에 반영</strong><small>등록 즉시 아티스트 정산 미리보기에 포함합니다.</small></span><input name="settlementIncluded" type="checkbox" checked /><i></i></label>
+            <button class="primary wide" type="submit">비용 등록 완료 <span>→</span></button>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section id="settlement" class="view">
+      <div class="page-title"><div><span class="eyebrow">SETTLEMENT PREVIEW</span><h1>정산 미리보기</h1></div><div class="total-card"><span>총 반영 비용</span><strong id="totalAmount">0원</strong></div></div>
+      <div class="table-card"><table><thead><tr><th>사용일</th><th>프로젝트 / 아티스트</th><th>사용처</th><th>항목</th><th>사용 목적</th><th class="right">금액</th><th>상태</th></tr></thead><tbody id="settlementRows"></tbody></table><div id="settlementEmpty" class="list-empty">등록된 비용이 없습니다.</div></div>
+    </section>
+
+    <section id="archive" class="view">
+      <div class="page-title"><div><span class="eyebrow">RECEIPT ARCHIVE</span><h1>영수증 보관함</h1></div><button class="primary" data-view="register">+ 새 영수증</button></div>
+      <div id="archiveGrid" class="archive-grid"></div><div id="archiveEmpty" class="list-empty">보관된 영수증이 없습니다.</div>
+    </section>
+  </main>
+  <div id="keyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="keyTitle">
+    <div class="modal-card">
+      <button id="closeKeyModal" class="modal-close" aria-label="닫기">×</button>
+      <span class="eyebrow">SECURE LOCAL SETUP</span>
+      <h2 id="keyTitle">OpenAI API 키 연결</h2>
+      <p>키는 현재 로컬 서버의 메모리에만 보관됩니다. 브라우저나 파일에 저장되지 않으며 서버를 종료하면 삭제됩니다.</p>
+      <form id="keyForm">
+        <label>API 키<input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-..." required /></label>
+        <small id="keyMessage"></small>
+        <button class="primary wide" type="submit">안전하게 연결하기</button>
+      </form>
+    </div>
+  </div>
+  <div id="toast" class="toast"><span>✓</span><div><strong>비용 등록이 완료됐어요</strong><small>정산 미리보기에 반영했습니다.</small></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
