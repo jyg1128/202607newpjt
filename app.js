@@ -101,7 +101,11 @@ $('#recognizeBtn').addEventListener('click', async () => {
   try {
     const response = await fetch('/api/recognize-receipt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ imageBase64: state.image }) });
     const result = await readJson(response);
-    if (!response.ok) throw new Error(result.error || 'AI 인식에 실패했습니다.');
+    if (!response.ok) {
+      const error = new Error(result.error || 'AI 인식에 실패했습니다.');
+      error.code = result.code;
+      throw error;
+    }
     const values = result.extracted || {};
     Object.entries(values).forEach(([key, value]) => { if (form.elements[key] && value !== null) form.elements[key].value = value; });
     if (!values.amount && values.taxableAmount !== null && values.vat !== null) form.elements.amount.value = Number(values.taxableAmount) + Number(values.vat);
@@ -117,6 +121,12 @@ $('#recognizeBtn').addEventListener('click', async () => {
   } catch (error) {
     $('#resultBadge').textContent = '인식 실패';
     button.textContent = '다시 시도하기';
+    if (error.code === 'insufficient_quota') {
+      $('#emptyState').classList.add('hidden');
+      form.classList.remove('hidden');
+      $('#warning').textContent = error.message;
+      button.textContent = 'AI 인식 다시 시도';
+    }
     alert(error.message);
   } finally { button.disabled = false; }
 });
