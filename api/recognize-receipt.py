@@ -47,7 +47,7 @@ class handler(BaseHTTPRequestHandler):
             if not image.startswith("data:image/"):
                 self.send_json(400, {"error": "유효한 영수증 이미지가 필요합니다."})
                 return
-            api_key = os.getenv("OPENAI_API_KEY")
+            api_key = (os.getenv("OPENAI_API_KEY") or "").strip()
             if not api_key:
                 self.send_json(401, {"error": "OpenAI API 키를 먼저 연결해주세요."})
                 return
