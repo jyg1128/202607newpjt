@@ -155,4 +155,44 @@ function renderLists() {
   $('#archiveGrid').innerHTML = state.expenses.map((item) => `<article class="archive-card"><img src="${item.image}" alt="영수증"><div class="archive-info"><strong>${item.merchant}</strong><span>${item.paidDate} · ${item.amount.toLocaleString('ko-KR')}원 · ${item.artist}</span></div></article>`).join('');
   $('#archiveEmpty').classList.toggle('hidden', state.expenses.length > 0);
 }
+
+const EXPORT_COLUMNS = [
+  ['사용일', 'paidDate'], ['사용시간', 'paidTime'], ['매장명', 'merchant'],
+  ['과세물품가액', 'taxableAmount'], ['부가세', 'vat'], ['총 결제금액', 'amount'],
+  ['카드명', 'cardName'], ['카드승인번호', 'approvalNumber'], ['프로젝트', 'project'],
+  ['아티스트', 'artist'], ['비용 항목', 'category'], ['사용 목적', 'purpose'],
+  ['정산 반영', 'settlementIncluded']
+];
+
+function csvCell(value) {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'number') return String(value);
+  if (typeof value === 'boolean') return value ? '예' : '아니오';
+  let text = String(value).replace(/\r?\n/g, ' ');
+  if (/^[=+\-@]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function downloadExcelCsv(items, kind) {
+  if (!items.length) {
+    alert('다운로드할 비용 내역이 없습니다.');
+    return;
+  }
+  const rows = [EXPORT_COLUMNS.map(([label]) => csvCell(label)).join(',')];
+  items.forEach((item) => rows.push(EXPORT_COLUMNS.map(([, key]) => csvCell(item[key])).join(',')));
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10).replaceAll('-', '');
+  link.href = url;
+  link.download = `clearcost_${kind}_${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+$('#downloadExcelBtn').addEventListener('click', () => downloadExcelCsv(state.expenses, '비용등록'));
+$('#downloadSettlementExcelBtn').addEventListener('click', () => downloadExcelCsv(state.expenses.filter((item) => item.settlementIncluded), '정산미리보기'));
 renderLists();
