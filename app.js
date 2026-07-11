@@ -1,6 +1,7 @@
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 const IS_STATIC_HOST = location.hostname.endsWith('github.io');
+const IS_VERCEL = location.hostname.endsWith('vercel.app');
 const state = { image: null, expenses: JSON.parse(localStorage.getItem('clearcost-expenses') || '[]') };
 const form = $('#expenseForm');
 const fileInput = $('#fileInput');
@@ -30,6 +31,7 @@ if (IS_STATIC_HOST) {
   $('#staticNotice').classList.remove('hidden');
   $('#recognizeBtn').textContent = 'AI 인식은 로컬 서버에서 사용 가능';
 } else {
+  if (IS_VERCEL) keyButton.classList.add('hidden');
   refreshKeyStatus();
 }
 

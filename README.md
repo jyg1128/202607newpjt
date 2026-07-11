@@ -23,3 +23,7 @@ python server.py
 - 모바일 반응형 화면
 
 API 키는 브라우저에 노출하지 않고 로컬 서버에서만 읽습니다.
+
+## Vercel 배포
+
+`api/recognize-receipt.py`가 Vercel 서버리스 함수로 동작합니다. Vercel 프로젝트 설정의 Environment Variables에 `OPENAI_API_KEY`와 선택적으로 `OPENAI_MODEL`을 등록해야 합니다. API 키는 브라우저나 Git 저장소로 전달되지 않습니다.
